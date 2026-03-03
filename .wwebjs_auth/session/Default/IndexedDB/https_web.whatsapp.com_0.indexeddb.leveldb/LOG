@@ -1,0 +1,26 @@
+2026/03/04-01:33:42.345 879cfc Reusing MANIFEST /Users/varun/Developer/pratima-agale-fresh/whatsapp-bot/.wwebjs_auth/session/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/03/04-01:33:42.346 879cfc Recovering log #234
+2026/03/04-01:33:42.383 879cfc Reusing old log /Users/varun/Developer/pratima-agale-fresh/whatsapp-bot/.wwebjs_auth/session/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000234.log 
+2026/03/04-01:33:49.767 879cfe Level-0 table #246: started
+2026/03/04-01:33:49.796 879cfe Level-0 table #246: 1166189 bytes OK
+2026/03/04-01:33:49.798 879cfe Delete type=0 #234
+2026/03/04-01:33:50.361 879cfe Compacting 1@1 + 8@2 files
+2026/03/04-01:33:50.623 879cfe Generated table #247@1: 58417 keys, 2219518 bytes
+2026/03/04-01:33:50.711 879cfe Generated table #248@1: 20640 keys, 2169070 bytes
+2026/03/04-01:33:50.775 879cfe Generated table #249@1: 2212 keys, 2151031 bytes
+2026/03/04-01:33:50.832 879cfe Generated table #250@1: 10080 keys, 2167769 bytes
+2026/03/04-01:33:50.924 879cfe Generated table #251@1: 31398 keys, 2236432 bytes
+2026/03/04-01:33:51.017 879cfe Generated table #252@1: 40071 keys, 2172029 bytes
+2026/03/04-01:33:51.101 879cfe Generated table #253@1: 100535 keys, 2252587 bytes
+2026/03/04-01:33:51.150 879cfe Generated table #254@1: 56730 keys, 1421655 bytes
+2026/03/04-01:33:51.150 879cfe Compacted 1@1 + 8@2 files => 16790091 bytes
+2026/03/04-01:33:51.151 879cfe compacted to: files[ 0 0 8 0 0 0 0 ]
+2026/03/04-01:33:51.151 879cfe Delete type=2 #239
+2026/03/04-01:33:51.151 879cfe Delete type=2 #238
+2026/03/04-01:33:51.151 879cfe Delete type=2 #236
+2026/03/04-01:33:51.151 879cfe Delete type=2 #237
+2026/03/04-01:33:51.152 879cfe Delete type=2 #241
+2026/03/04-01:33:51.152 879cfe Delete type=2 #240
+2026/03/04-01:33:51.152 879cfe Delete type=2 #242
+2026/03/04-01:33:51.152 879cfe Delete type=2 #243
+2026/03/04-01:33:51.152 879cfe Delete type=2 #246
