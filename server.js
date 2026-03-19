@@ -9,7 +9,8 @@ const puppeteer = require("puppeteer");
 
 const client = new Client({
   authStrategy: new LocalAuth({
-    clientId: "railway-session", // 👈 IMPORTANT
+    clientId: "railway-fresh", // 👈 change name (IMPORTANT)
+    dataPath: "/tmp/wwebjs_auth", // 👈 force temp storage
   }),
   puppeteer: {
     headless: true,
@@ -18,7 +19,7 @@ const client = new Client({
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
       "--disable-gpu",
-      "--user-data-dir=/tmp/chrome-session", // 👈 FIX
+      "--user-data-dir=/tmp/chrome-session-" + Date.now(), // 👈 UNIQUE every run
     ],
   },
 });
