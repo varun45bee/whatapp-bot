@@ -5,54 +5,41 @@ const qrcode = require("qrcode-terminal");
 const app = express();
 app.use(express.json());
 
-// ✅ WhatsApp Client (FINAL FIXED VERSION)
+let isReady = false;
+
+// ✅ WhatsApp Client (MINIMAL + STABLE)
 const client = new Client({
   puppeteer: {
     headless: true,
-    ignoreDefaultArgs: ["--enable-automation"], // ✅ key fix
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--no-first-run",
-      "--no-zygote",
-      "--single-process",
-      "--disable-extensions",
-      "--disable-sync",
-      "--disable-background-networking",
-      "--disable-default-apps",
-      "--disable-popup-blocking",
-      "--disable-translate",
-      "--disable-features=TranslateUI",
-      "--user-data-dir=/tmp/puppeteer-" + Date.now(), // ✅ force clean profile
     ],
   },
 });
 
-let isReady = false;
-
-// ✅ Show QR Code
+// ✅ QR Code
 client.on("qr", (qr) => {
   console.log("\n📱 Scan this QR code with Dr. Pratima's WhatsApp:\n");
   qrcode.generate(qr, { small: true });
 });
 
-// ✅ When Ready
+// ✅ Ready
 client.on("ready", () => {
   isReady = true;
   console.log("✅ WhatsApp Bot is ready and connected!");
 });
 
-// ✅ Handle Disconnect
+// ✅ Disconnected
 client.on("disconnected", () => {
   isReady = false;
-  console.log("❌ WhatsApp disconnected. Reconnecting...");
-  client.initialize();
+  console.log("❌ WhatsApp disconnected.");
 });
 
-// ✅ Initialize
-client.initialize();
+// ✅ DELAYED START (VERY IMPORTANT FIX)
+setTimeout(() => {
+  client.initialize();
+}, 5000);
 
 // ✅ API Endpoint
 app.post("/send", async (req, res) => {
@@ -94,7 +81,7 @@ _Sent via Dr. Pratima Agale Website_`;
   }
 });
 
-// ✅ Health Check
+// ✅ Health check
 app.get("/", (req, res) => {
   res.json({ status: "WhatsApp bot running", ready: isReady });
 });
