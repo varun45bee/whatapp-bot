@@ -9,6 +9,7 @@ app.use(express.json());
 const client = new Client({
   puppeteer: {
     headless: true,
+    ignoreDefaultArgs: ["--enable-automation"], // ✅ key fix
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -17,8 +18,14 @@ const client = new Client({
       "--no-first-run",
       "--no-zygote",
       "--single-process",
-      "--remote-debugging-port=0", // ✅ avoids profile conflict
-      `--user-data-dir=/tmp/chrome-${Date.now()}`, // ✅ unique every run
+      "--disable-extensions",
+      "--disable-sync",
+      "--disable-background-networking",
+      "--disable-default-apps",
+      "--disable-popup-blocking",
+      "--disable-translate",
+      "--disable-features=TranslateUI",
+      "--user-data-dir=/tmp/puppeteer-" + Date.now(), // ✅ force clean profile
     ],
   },
 });
