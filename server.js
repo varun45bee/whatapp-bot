@@ -5,11 +5,13 @@ const qrcode = require("qrcode-terminal");
 const app = express();
 app.use(express.json());
 
+const puppeteer = require("puppeteer");
+
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    executablePath: puppeteer.executablePath(),
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
