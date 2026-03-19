@@ -8,15 +8,17 @@ app.use(express.json());
 const puppeteer = require("puppeteer");
 
 const client = new Client({
-  authStrategy: new LocalAuth(),
+  authStrategy: new LocalAuth({
+    clientId: "railway-session", // 👈 IMPORTANT
+  }),
   puppeteer: {
     headless: true,
-    executablePath: puppeteer.executablePath(),
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
       "--disable-gpu",
+      "--user-data-dir=/tmp/chrome-session", // 👈 FIX
     ],
   },
 });
