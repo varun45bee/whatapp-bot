@@ -10,8 +10,8 @@ const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: '/opt/render/.cache/puppeteer/chrome/linux-*/chrome-linux64/chrome',
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    executablePath: require("puppeteer").executablePath(),
   },
 });
 
@@ -75,6 +75,8 @@ _Sent via Dr. Pratima Agale Website_`;
 // ✅ Health check
 app.get("/", (req, res) => res.json({ status: "WhatsApp bot running", ready: isReady }));
 
-app.listen(3001, () => {
-  console.log("🚀 WhatsApp bot server running on port 3001");
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
