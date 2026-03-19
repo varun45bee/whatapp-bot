@@ -1,3 +1,5 @@
+
+process.env.MONGODB_URI = "mongodb+srv://varun45j_db_user:dRLMrExDHOLNh0P9@cluster0.hccmxyx.mongodb.net/whatsappbot?appName=Cluster0";
 const { Client, RemoteAuth } = require("whatsapp-web.js");
 const { MongoStore } = require("wwebjs-mongo");
 const mongoose = require("mongoose");
