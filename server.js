@@ -183,7 +183,7 @@ app.get("/qr", async (req, res) => {
 });
 
 // ================= SERVER =================
-
+//nono
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
