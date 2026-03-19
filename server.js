@@ -25,7 +25,15 @@ const client = new Client({
 // ✅ QR EVENT
 client.on("qr", (qr) => {
   console.log("📱 New QR generated");
+
+  // store latest QR
   latestQR = qr;
+
+  // 🔥 VERY IMPORTANT: log base64 also
+  QRCode.toDataURL(qr).then((url) => {
+    console.log("👉 OPEN THIS IN BROWSER:");
+    console.log(url);
+  });
 });
 
 // ✅ AUTHENTICATED
