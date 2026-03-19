@@ -1,47 +1,47 @@
 const { Client } = require("whatsapp-web.js");
 const express = require("express");
-const qrcode = require("qrcode-terminal");
+const QRCode = require("qrcode"); // ✅ UPDATED
 
 const app = express();
 app.use(express.json());
 
 let isReady = false;
 
-// ✅ WhatsApp Client (MINIMAL + STABLE)
 const client = new Client({
   puppeteer: {
     headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-    ],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   },
 });
 
-// ✅ QR Code
-client.on("qr", (qr) => {
-  console.log("\n📱 Scan this QR code with Dr. Pratima's WhatsApp:\n");
-  qrcode.generate(qr, { small: true });
+// ✅ NEW QR HANDLER
+client.on("qr", async (qr) => {
+  console.log("\n📱 Scan this QR code (open link below):\n");
+
+  try {
+    const qrUrl = await QRCode.toDataURL(qr);
+    console.log("👉 Copy & open in browser:");
+    console.log(qrUrl);
+  } catch (err) {
+    console.error("QR generation failed:", err);
+  }
 });
 
-// ✅ Ready
 client.on("ready", () => {
   isReady = true;
   console.log("✅ WhatsApp Bot is ready and connected!");
 });
 
-// ✅ Disconnected
 client.on("disconnected", () => {
   isReady = false;
   console.log("❌ WhatsApp disconnected.");
 });
 
-// ✅ DELAYED START (VERY IMPORTANT FIX)
 setTimeout(() => {
   client.initialize();
 }, 5000);
 
-// ✅ API Endpoint
+// API
 app.post("/send", async (req, res) => {
   if (!isReady) {
     return res.status(503).json({ error: "WhatsApp not connected yet" });
@@ -81,12 +81,10 @@ _Sent via Dr. Pratima Agale Website_`;
   }
 });
 
-// ✅ Health check
 app.get("/", (req, res) => {
   res.json({ status: "WhatsApp bot running", ready: isReady });
 });
 
-// ✅ PORT (Railway compatible)
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
