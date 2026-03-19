@@ -20,10 +20,17 @@ const client = new Client({
   },
 });
 
-// ✅ QR EVENT (store QR)
+// ================= EVENTS =================
+
+// ✅ QR EVENT
 client.on("qr", (qr) => {
-  console.log("📱 QR received → open /qr in browser");
+  console.log("📱 New QR generated");
   latestQR = qr;
+});
+
+// ✅ AUTHENTICATED
+client.on("authenticated", () => {
+  console.log("✅ Authenticated successfully!");
 });
 
 // ✅ READY
@@ -32,25 +39,22 @@ client.on("ready", () => {
   console.log("✅ WhatsApp Bot is ready and connected!");
 });
 
-// ✅ AUTH DEBUG (optional but helpful)
-client.on("authenticated", () => {
-  console.log("✅ Authenticated successfully!");
-});
-
 // ✅ DISCONNECTED
 client.on("disconnected", () => {
   isReady = false;
   console.log("❌ WhatsApp disconnected.");
 });
 
-// ✅ DELAY START (important for Railway)
+// ================= START =================
+
+// Delay start (important for Railway)
 setTimeout(() => {
   client.initialize();
 }, 5000);
 
 // ================= API =================
 
-// ✅ SEND MESSAGE
+// ✅ SEND MESSAGE API
 app.post("/send", async (req, res) => {
   if (!isReady) {
     return res.status(503).json({ error: "WhatsApp not connected yet" });
@@ -90,35 +94,49 @@ _Sent via Dr. Pratima Agale Website_`;
   }
 });
 
+// ================= ROUTES =================
+
 // ✅ HEALTH CHECK
 app.get("/", (req, res) => {
   res.json({ status: "WhatsApp bot running", ready: isReady });
 });
 
-// ✅ QR PAGE (MAIN FEATURE 🔥)
+// ✅ QR PAGE (AUTO REFRESH)
 app.get("/qr", async (req, res) => {
-  if (!latestQR) {
-    return res.send("⏳ QR not generated yet. Refresh...");
+  try {
+    if (!latestQR) {
+      return res.send(`
+        <html>
+          <body style="text-align:center;">
+            <h2>⏳ Waiting for QR...</h2>
+            <p>Refresh in 5 seconds</p>
+          </body>
+        </html>
+      `);
+    }
+
+    const qrImage = await QRCode.toDataURL(latestQR);
+
+    res.send(`
+      <html>
+        <head>
+          <title>WhatsApp QR</title>
+          <meta http-equiv="refresh" content="10">
+        </head>
+        <body style="text-align:center; font-family:sans-serif;">
+          <h2>📱 Scan QR with WhatsApp</h2>
+          <img src="${qrImage}" width="300"/>
+          <p>Auto refresh every 10 seconds</p>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    res.send("❌ Error generating QR");
   }
-
-  const qrImage = await QRCode.toDataURL(latestQR);
-
-  res.send(`
-    <html>
-      <head>
-        <title>WhatsApp QR</title>
-        <meta http-equiv="refresh" content="20">
-      </head>
-      <body style="text-align:center; font-family:sans-serif;">
-        <h2>📱 Scan QR with WhatsApp</h2>
-        <img src="${qrImage}" />
-        <p>Auto-refresh every 20 seconds</p>
-      </body>
-    </html>
-  `);
 });
 
-// ✅ PORT
+// ================= SERVER =================
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
