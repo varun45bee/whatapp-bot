@@ -11,3 +11,5 @@ node_modules
 # Puppeteer config (optional, depends on your setup)
 puppeteer.config.cjs
 EOF
+#
+echo "node_modules/" >> .gitignore
