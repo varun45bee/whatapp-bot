@@ -1,5 +1,3 @@
-
-process.env.MONGODB_URI = "mongodb+srv://varun45j_db_user:dRLMrExDHOLNh0P9@cluster0.hccmxyx.mongodb.net/whatsappbot?appName=Cluster0";
 const { Client, RemoteAuth } = require("whatsapp-web.js");
 const { MongoStore } = require("wwebjs-mongo");
 const mongoose = require("mongoose");
@@ -8,6 +6,11 @@ const QRCode = require("qrcode");
 
 const app = express();
 app.use(express.json());
+
+// Hardcoded as fallback (remove after Railway env var is confirmed working)
+process.env.MONGODB_URI =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://varun45j_db_user:dRLMrExDHOLNh0P9@cluster0.hccmxyx.mongodb.net/whatsappbot?appName=Cluster0";
 
 let isReady = false;
 let latestQR = null;
@@ -104,10 +107,17 @@ app.post("/send", async (req, res) => {
 
   const { name, phone, email, condition, date, time, lang, message } = req.body;
 
+  if (!name || !phone || !condition) {
+    return res
+      .status(400)
+      .json({ error: "Missing required fields: name, phone, condition" });
+  }
+
   const langLabel =
     lang === "en" ? "English" : lang === "hi" ? "Hindi" : "Marathi";
 
-  const msg = `🌿 *New Consultation Request*
+  // ========== DOCTOR MESSAGE ==========
+  const doctorMsg = `🌿 *New Consultation Request*
 ━━━━━━━━━━━━━━━━━━━━
 👤 *Patient Details*
 • Name      : ${name}
@@ -123,10 +133,48 @@ app.post("/send", async (req, res) => {
 ━━━━━━━━━━━━━━━━━━━━
 _Sent via Dr. Pratima Agale Website_`;
 
+  // ========== PATIENT MESSAGE ==========
+  const patientMsg = `🌿 *Consultation Request Received!*
+━━━━━━━━━━━━━━━━━━━━
+Hello *${name}*! 👋
+
+Your consultation request has been successfully received.
+
+🩺 *Your Booking Details*
+• Condition : ${condition}
+• Date      : ${date || "Not specified"}
+• Time      : ${time || "Not specified"}
+• Language  : ${langLabel}
+
+✅ Dr. Pratima Agale will contact you shortly on this number.
+
+Thank you for choosing us! 🙏
+━━━━━━━━━━━━━━━━━━━━
+_Dr. Pratima Agale Clinic_`;
+
   try {
-    const toNumber = "919359875511@c.us";
-    await client.sendMessage(toNumber, msg);
-    res.json({ success: true });
+    // Doctor's WhatsApp number
+    const doctorNumber = "918446104790@c.us";
+
+    // Clean patient phone — remove +, spaces, dashes
+    const cleanPhone = phone.replace(/[\s\+\-]/g, "");
+
+    // Build patient number with India code 91
+    const patientNumber = cleanPhone.startsWith("0")
+      ? `91${cleanPhone.slice(1)}@c.us`
+      : cleanPhone.startsWith("91")
+      ? `${cleanPhone}@c.us`
+      : `91${cleanPhone}@c.us`;
+
+    console.log(`📤 Sending to doctor: ${doctorNumber}`);
+    await client.sendMessage(doctorNumber, doctorMsg);
+    console.log("✅ Doctor message sent!");
+
+    console.log(`📤 Sending to patient: ${patientNumber}`);
+    await client.sendMessage(patientNumber, patientMsg);
+    console.log("✅ Patient message sent!");
+
+    res.json({ success: true, message: "Messages sent to doctor and patient" });
   } catch (err) {
     console.error("Send error:", err);
     res.status(500).json({ error: "Failed to send message" });
@@ -148,9 +196,10 @@ app.get("/qr", async (req, res) => {
     if (isReady) {
       return res.send(`
         <html>
-          <body style="text-align:center; font-family:sans-serif; padding:40px;">
+          <body style="text-align:center; font-family:sans-serif; padding:40px; background:#f0f9f0;">
             <h2>✅ WhatsApp Already Connected!</h2>
-            <p>Bot is live. No need to scan.</p>
+            <p>Bot is live and ready to send messages.</p>
+            <p style="color:green; font-size:20px;">🟢 Online</p>
           </body>
         </html>
       `);
@@ -173,14 +222,15 @@ app.get("/qr", async (req, res) => {
     res.send(`
       <html>
         <head>
-          <title>WhatsApp QR</title>
+          <title>WhatsApp QR - Dr. Pratima Agale</title>
           <meta http-equiv="refresh" content="20">
         </head>
-        <body style="text-align:center; font-family:sans-serif; padding:40px;">
+        <body style="text-align:center; font-family:sans-serif; padding:40px; background:#f0f9f0;">
           <h2>📱 Scan with WhatsApp</h2>
           <p>Open WhatsApp → Linked Devices → Link a Device</p>
-          <img src="${qrImage}" width="300" style="border:4px solid #25D366; border-radius:12px;"/>
+          <img src="${qrImage}" width="300" style="border:4px solid #25D366; border-radius:12px; margin:20px auto; display:block;"/>
           <p style="color:gray;">Auto-refreshes every 20 seconds. Scan quickly!</p>
+          <p style="color:#25D366; font-weight:bold;">Dr. Pratima Agale WhatsApp Bot</p>
         </body>
       </html>
     `);
@@ -190,7 +240,7 @@ app.get("/qr", async (req, res) => {
 });
 
 // ================= SERVER =================
-//nono
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
