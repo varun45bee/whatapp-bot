@@ -1,17 +1,12 @@
-const { Client, LocalAuth } = require("whatsapp-web.js");
+const { Client } = require("whatsapp-web.js");
 const express = require("express");
 const qrcode = require("qrcode-terminal");
 
 const app = express();
 app.use(express.json());
 
-const puppeteer = require("puppeteer");
-
+// ✅ WhatsApp Client (FINAL FIXED VERSION)
 const client = new Client({
-  authStrategy: new LocalAuth({
-    clientId: "railway-final-" + Date.now(),
-    dataPath: "/tmp/wwebjs_auth",
-  }),
   puppeteer: {
     headless: true,
     args: [
@@ -22,33 +17,37 @@ const client = new Client({
       "--no-first-run",
       "--no-zygote",
       "--single-process",
-      `--user-data-dir=/tmp/chrome-${Date.now()}`, // ✅ UNIQUE EVERY TIME
+      "--remote-debugging-port=0", // ✅ avoids profile conflict
+      `--user-data-dir=/tmp/chrome-${Date.now()}`, // ✅ unique every run
     ],
   },
 });
 
 let isReady = false;
 
-// ✅ Show QR code in terminal — Dr. Pratima scans this once
+// ✅ Show QR Code
 client.on("qr", (qr) => {
   console.log("\n📱 Scan this QR code with Dr. Pratima's WhatsApp:\n");
   qrcode.generate(qr, { small: true });
 });
 
+// ✅ When Ready
 client.on("ready", () => {
   isReady = true;
   console.log("✅ WhatsApp Bot is ready and connected!");
 });
 
+// ✅ Handle Disconnect
 client.on("disconnected", () => {
   isReady = false;
   console.log("❌ WhatsApp disconnected. Reconnecting...");
   client.initialize();
 });
 
+// ✅ Initialize
 client.initialize();
 
-// ✅ API endpoint — called by your Next.js app
+// ✅ API Endpoint
 app.post("/send", async (req, res) => {
   if (!isReady) {
     return res.status(503).json({ error: "WhatsApp not connected yet" });
@@ -56,8 +55,7 @@ app.post("/send", async (req, res) => {
 
   const { name, phone, email, condition, date, time, lang, message } = req.body;
 
-  const msg =
-`🌿 *New Consultation Request*
+  const msg = `🌿 *New Consultation Request*
 ━━━━━━━━━━━━━━━━━━━━
 👤 *Patient Details*
 • Name      : ${name}
@@ -68,13 +66,18 @@ app.post("/send", async (req, res) => {
 • Condition : ${condition}
 • Date      : ${date || "Not specified"}
 • Time      : ${time || "Not specified"}
-• Language  : ${lang === "en" ? "English" : lang === "hi" ? "Hindi" : "Marathi"}
+• Language  : ${
+    lang === "en"
+      ? "English"
+      : lang === "hi"
+      ? "Hindi"
+      : "Marathi"
+  }
 • Message   : ${message || "None"}
 ━━━━━━━━━━━━━━━━━━━━
 _Sent via Dr. Pratima Agale Website_`;
 
   try {
-    // ✅ Dr. Pratima's number — 91 + 10 digits + @c.us
     const toNumber = "919359875511@c.us";
     await client.sendMessage(toNumber, msg);
     res.json({ success: true });
@@ -84,9 +87,12 @@ _Sent via Dr. Pratima Agale Website_`;
   }
 });
 
-// ✅ Health check
-app.get("/", (req, res) => res.json({ status: "WhatsApp bot running", ready: isReady }));
+// ✅ Health Check
+app.get("/", (req, res) => {
+  res.json({ status: "WhatsApp bot running", ready: isReady });
+});
 
+// ✅ PORT (Railway compatible)
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
