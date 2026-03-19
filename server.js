@@ -38,7 +38,12 @@ async function startBot() {
           "--disable-accelerated-2d-canvas",
           "--no-first-run",
           "--no-zygote",
+          "--single-process",
           "--disable-gpu",
+          "--disable-extensions",
+          "--disable-software-rasterizer",
+          "--ignore-certificate-errors",
+          "--window-size=1280,720",
         ],
       },
     });
