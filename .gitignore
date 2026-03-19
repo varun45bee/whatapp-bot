@@ -1,0 +1,12 @@
+cat >> .gitignore << 'EOF'
+
+# Puppeteer Chrome cache - never commit this!
+.cache/
+
+# WhatsApp session data - regenerated via QR code
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Puppeteer config (optional, depends on your setup)
+puppeteer.config.cjs
+EOF
